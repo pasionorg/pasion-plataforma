@@ -9,34 +9,23 @@ Las implementaciones actualmente activas corresponden a Uruguay, como mercado in
 
 La información institucional completa, junto con los estándares y el detalle de cada operación, se encuentra disponible en [pasion.org](https://pasion.org)
 
-## Descripción Técnica General del Sistema
+## Arquitectura del sistema
 
-Pasion es una plataforma web construida sobre WordPress como base, extendida mediante una arquitectura modular de plugins propietarios interconectados.
+La plataforma opera sobre una arquitectura modular compuesta por aproximadamente 25 módulos independientes organizados alrededor de un núcleo central. Cada módulo resuelve un dominio específico — perfiles, pagos, verificación, moderación, comunicaciones — y se comunica con los demás a través de interfaces internas compartidas. Esta estructura permite incorporar o modificar funcionalidades sin afectar el resto del sistema.
 
-Arquitectura general. El ecosistema se compone de aproximadamente 25 plugins independientes que se comunican entre sí a través de funciones compartidas, hooks de WordPress y tablas de base de datos propias. Existe un plugin central (core) del cual dependen todos los demás, que provee funcionalidades transversales como encriptación de datos sensibles, sistema de notificaciones internas, gestión de páginas y restricciones de acceso por rol. Sobre este núcleo, cada plugin resuelve un dominio específico del negocio.
+El mismo código base se adapta a cada país mediante capas de personalización visual y operativa, lo que permite mantener una infraestructura técnica única con identidad y configuración diferenciada por mercado.
 
-Gestión geográfica. El sistema opera con una estructura jerárquica de países, ciudades y barrios, cada uno con coordenadas geográficas. Un mecanismo de detección automática identifica la ubicación del visitante combinando cookies, parámetros de URL y headers del servidor, lo que permite personalizar la experiencia sin intervención del usuario.
+**Capacidades principales:**
 
-Perfiles y contenido. Los perfiles se modelan como Custom Post Types de WordPress, lo que permite aprovechar de forma nativa las taxonomías, metadatos y sistema de búsqueda del CMS. El sistema incluye carga infinita optimizada con precarga de metadatos en lote (una sola consulta para múltiples perfiles), reduciendo significativamente las consultas a base de datos.
-
-Búsqueda y filtrado. Existe un motor de búsqueda avanzada configurable que genera formularios dinámicos y traduce las selecciones del usuario a consultas optimizadas usando taxonomías y meta queries. Los formularios se cargan por AJAX para evitar problemas con cachés de página.
-
-Multimedia. El sistema procesa y normaliza automáticamente imágenes y videos subidos por los usuarios: convierte formatos no estándar, aplica marcas de agua configurables, valida tipos MIME y optimiza resoluciones. La carga es asíncrona con previsualización en tiempo real.
-
-Suscripciones y pagos. La plataforma opera con un modelo de suscripción por planes con diferentes niveles, duraciones y precios que pueden variar según la ciudad y categoría. Se integra con múltiples pasarelas de pago según el país de operación. Incluye un sistema de referidos con comisiones escalonadas y balance por perfil.
-
-Verificación de identidad (KYC). Los perfiles pasan por un proceso de verificación de identidad que puede ser manual o mediante un proveedor externo. Los datos sensibles se almacenan encriptados y las fotografías de documentos se eliminan automáticamente después de un período definido.
-
-Comunicaciones. El sistema cuenta con envío de SMS a través de una cola en base de datos, procesada por tareas programadas dentro de ventanas horarias específicas. Los mensajes se normalizan para compatibilidad con redes GSM.
-
-Geolocalización. Una funcionalidad de proximidad calcula distancias en tiempo real usando la fórmula de Haversine, permitiendo a los visitantes encontrar perfiles cercanos a su ubicación con un radio configurable.
-
-Contenido efímero. Similar a las "historias" de redes sociales, el sistema permite publicar contenido temporal con expiración automática. Incluye un módulo de programación que permite automatizar publicaciones por días y horarios.
-
-Moderación y administración. Un panel administrativo interno permite gestionar perfiles, pagos, verificaciones, denuncias y estadísticas. El sistema de denuncias encripta la información sensible del denunciante y clasifica los reportes por tipo y estado. Existe un rol de moderador con permisos limitados.
-
-SEO y visibilidad. El sistema genera automáticamente datos estructurados (Schema.org), gestiona la indexación de perfiles según su antigüedad y estado, y construye rutas amigables con breadcrumbs dinámicos.
-
-Tareas programadas. Un gestor centralizado de tareas cron coordina procesos periódicos como limpieza de datos expirados, recálculo de conteos, envío de notificaciones y mantenimiento general, con auto-reparación de tareas perdidas.
-
-Temas y frontend. La capa visual utiliza un tema padre con temas hijos por país, permitiendo personalizar la identidad visual de cada operación manteniendo una base de código compartida. Los componentes de interfaz son modulares y reutilizables a través de un sistema de registro con configuración en JSON.
+- Gestión geográfica jerárquica con detección automática de ubicación del visitante.
+- Perfiles con carga progresiva optimizada para alto volumen de consultas simultáneas.
+- Motor de búsqueda avanzada con filtros dinámicos y formularios configurables.
+- Procesamiento automático de imágenes y videos: conversión de formatos, marcas de agua, validación y optimización.
+- Suscripciones con planes diferenciados por ubicación y categoría, integración con múltiples medios de pago por país, y sistema de referidos.
+- Verificación de identidad combinando proveedores externos y revisión manual, con almacenamiento encriptado y eliminación programada de documentos.
+- Comunicaciones por SMS con encolamiento y ventanas horarias.
+- Búsqueda por proximidad geográfica en tiempo real.
+- Contenido efímero con expiración y programación automática.
+- Panel de administración y moderación con sistema de denuncias, roles diferenciados y registro de intervenciones.
+- Generación automática de datos estructurados, gestión de indexación y rutas optimizadas para buscadores.
+- Gestión centralizada de tareas periódicas con recuperación automática ante fallos.
